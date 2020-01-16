@@ -249,6 +249,7 @@ class GamePadTaskGenerator(TaskGenerator):
         self.pub_l = rospy.Publisher('/right/UbirosGentle', Int8, queue_size = 1)
         self.pubPro_l = rospy.Publisher('/left/UbirosGentlePro', Int8, queue_size = 1)
         self.pubPro_r = rospy.Publisher('/right/UbirosGentlePro', Int8, queue_size = 1)
+        self.angles_sub = rospy.Subscriber('/relaxed_ik/joint_angle_solutions',JointAngles, self.callback_angles)
         self.grip_l = 0
         self.grip_r = 0
         self.camera_count = 1
@@ -610,6 +611,9 @@ class ServiceThread(threading.Thread):
 
     def kill(self):
         self._kill = True
+        
+def callback_angles(data):
+    print data
 
 def make():
     return GamePadTaskGenerator()
