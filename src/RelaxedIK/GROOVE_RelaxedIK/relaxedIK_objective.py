@@ -15,7 +15,9 @@ from ..Utils.joint_utils import *
 
 def objective_master_relaxedIK(x):
     vars = get_groove_global_vars()
-    
+    for i,name in enumerate(vars.overwrite_joints):
+        index = vars.joint_order.index(name)
+        x[index] = vars.overwrite_joint_values[i]
     vars.frames = vars.robot.getFrames(x)
 
     return objective_master(x)

@@ -249,7 +249,7 @@ class GamePadTaskGenerator(TaskGenerator):
         self.pub_l = rospy.Publisher('/right/UbirosGentle', Int8, queue_size = 1)
         self.pubPro_l = rospy.Publisher('/left/UbirosGentlePro', Int8, queue_size = 1)
         self.pubPro_r = rospy.Publisher('/right/UbirosGentlePro', Int8, queue_size = 1)
-        self.angles_sub = rospy.Subscriber('/relaxed_ik/joint_angle_solutions',JointAngles, self.callback_angles)
+        self.angles_sub = rospy.Subscriber('/relaxed_ik/joint_angle_solutions', Float32[], self.callback_angles)
         self.grip_l = 0
         self.grip_r = 0
         self.camera_count = 1

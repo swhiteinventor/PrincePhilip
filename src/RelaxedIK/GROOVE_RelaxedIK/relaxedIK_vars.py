@@ -165,6 +165,9 @@ class RelaxedIK_vars(Vars):
         self.prev_goal_quats2 = self.goal_quats
         self.prev_goal_quats = self.goal_quats
         self.frames = self.robot.getFrames(self.init_state)
+        
+        self.overwrite_joints = []
+        self.overwrite_joint_values = []
 
         self.joint_limit_obj_value = 0.0
 

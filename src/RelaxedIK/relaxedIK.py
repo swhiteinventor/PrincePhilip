@@ -1,9 +1,13 @@
+#! /usr/bin/env python
 from GROOVE.groove import get_groove
 import Utils.transformations as T
 import math as M
 import numpy as np
 import numpy.random as r
-from RelaxedIK.Utils.filter import EMA_filter
+import sys
+print sys.path
+sys.path.append('/home/trina/PrincePhilip/src/RelaxedIK/Utils/')
+from filter import EMA_filter
 
 def rand_vec(bounds):
     vec = []
@@ -50,7 +54,7 @@ class RelaxedIK(object):
         return RelaxedIK(vars)
 
 
-    def solve(self, goal_positions, goal_quats, prev_state=None, vel_objectives_on=True, unconstrained=True, verbose_output=False, max_iter=11, maxtime=.05, rand_start=False):
+    def solve(self, goal_positions, goal_quats, overwrite_joints=[], overwrite_joint_values=[], prev_state=None, vel_objectives_on=True, unconstrained=True, verbose_output=False, max_iter=11, maxtime=.05, rand_start=False):
 
         if self.vars.rotation_mode == 'relative':
             self.vars.goal_quats = []
@@ -79,7 +83,10 @@ class RelaxedIK(object):
             self.vars.goal_positions = []
             for i, p in enumerate(goal_positions):
                 self.vars.goal_positions.append(np.array(p))
-
+        
+        self.overwrite_joints = overwrite_joints
+        self.overwrite_joint_values = overwrite_joint_values
+        
         if prev_state == None:
             initSol = self.vars.xopt
         else:
@@ -97,7 +104,9 @@ class RelaxedIK(object):
         else:
             raise Exception('Invalid optimization package in relaxedIK.  Valid inputs are [scipy] and [nlopt].  Exiting.')
         ################################################################################################################
-
+        for i,name in enumerate(self.vars.overwrite_joints):
+            index = self.vars.joint_order.index(name)
+            xopt[index] = self.vars.overwrite_joint_values[i]
         xopt = self.filter.filter(xopt)
         self.vars.relaxedIK_vars_update(xopt)
 

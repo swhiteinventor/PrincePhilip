@@ -9,13 +9,21 @@ last update: 7/1/18
 Designed to subscribe to a topic containing end-effector pose of one hand, then calculating the pose of the other hand to achieve camera following.
 '''
 ######################################################################################################
-
+import os
+import sys
 import rospy
-from RelaxedIK.relaxedIK import RelaxedIK
+
 from relaxed_ik.msg import EEPoseGoals, JointAngles
 from std_msgs.msg import Float32
-from RelaxedIK.Utils.colors import bcolors
+# from relaxed_ik.Utils.colors import bcolors
+ebolabot_root = os.getenv("EBOLABOT_PATH",".")
+sys.path.append(ebolabot_root)
 from Common.system_config import EbolabotSystemConfig
+# import relaxed_ik
+sys.path.append('/home/trina/PrincePhilip/src/RelaxedIK/')
+from relaxedIK import RelaxedIK
+from baxter_core_msgs.msg import EndpointState
+
 
 #eepg = None
 #def eePoseGoals_cb(data):
@@ -27,14 +35,14 @@ def callback_pose(data):
 
 if __name__ == '__main__':
     rospy.init_node('relaxed_ik_node')
-    angles_pub = rospy.Publisher('/relaxed_ik/joint_angle_solutions',JointAngles,queue_size=3)
+    angles_pub = rospy.Publisher('/relaxed_ik/joint_angle_solutions',JointAngles ,queue_size=3)
     rospy.Subscriber('/robot/limb/left/endpoint_state', EndpointState, callback_pose)
     # TODO where does EndpointState get imported from?
     rospy.sleep(0.3)
 
     config_file_name = rospy.get_param('config_file_name', default='relaxedIK.config')
-    relaxedIK = RelaxedIK.init_from_config(config_file_name)
-    num_chains = relaxedIK.vars.robot.numChains
+    my_relaxedIK = RelaxedIK.init_from_config(config_file_name)
+    num_chains = my_relaxedIK.vars.robot.numChains
 
     rate = rospy.Rate(100)
     while not rospy.is_shutdown():
@@ -63,7 +71,7 @@ if __name__ == '__main__':
         pos_goals.append([pos_x, pos_y, pos_z])
         quat_goals.append([quat_w, quat_x, quat_y, quat_z])
 
-        xopt = relaxedIK.solve(pos_goals, quat_goals)
+        xopt = my_relaxedIK.solve(pos_goals, quat_goals)
         ja = JointAngles()
         ja.header = header
         for x in xopt:
